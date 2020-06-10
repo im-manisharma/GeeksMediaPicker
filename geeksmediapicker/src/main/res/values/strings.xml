@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="contentDescription">contentDescription</string>
+    <string name="select_album">Select Album</string>
+    <string name="ok">Ok</string>
+    <string name="selected">Selected</string>
+    <string name="please_select_a_media">Please select a media</string>
+    <string name="compressing_image">Compressing Image...</string>
+</resources>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="android.view.View" />
+
+        <variable
+            name="mediaData"
+            type="com.geeksmediapicker.models.MediaStoreData" />
+
+        <variable
+            name="itemPosition"
+            type="Integer" />
+
+        <variable
+            name="clickListener"
+            type="com.geeksmediapicker.interfaces.ItemClickListener" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="@{()->clickListener.onClick(itemPosition, null)}">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_120sdp"
+            tools:ignore="UselessParent">
+
+            <ImageView
+                android:id="@+id/iv_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/contentDescription"
+                android:scaleType="centerCrop"
+                bind:loadImageUri="@{mediaData.content_uri}" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/shadow_top_bottom">
+
+                <ImageView
+                    android:layout_width="@dimen/_10sdp"
+                    android:layout_height="@dimen/_10sdp"
+                    android:layout_gravity="end"
+                    android:layout_margin="@dimen/_4sdp"
+                    android:contentDescription="@string/contentDescription"
+                    android:gravity="center"
+                    android:src="@{mediaData.selected? @drawable/check_box_tick : @drawable/check_box}"
+                    android:textColor="@color/color_white"
+                    tools:src="@drawable/check_box_tick" />
+
+                <TextView
+                    android:id="@+id/tv_mediaDuration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:drawableStart="@drawable/ic_video_white"
+                    android:drawablePadding="@dimen/_4sdp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/poppins_medium"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:textColor="@color/color_white"
+                    android:textSize="@dimen/_8ssp"
+                    android:visibility="@{mediaData.media_type == `VIDEO`? View.VISIBLE: View.GONE, default = visible}"
+                    tools:text="1:30 s" />
+            </FrameLayout>
+        </FrameLayout>
+    </RelativeLayout>
+</layout>

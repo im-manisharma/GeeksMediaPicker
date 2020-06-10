@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="albumData"
+            type="com.geeksmediapicker.models.MediaStoreAlbum" />
+
+        <variable
+            name="itemPosition"
+            type="Integer" />
+
+        <variable
+            name="clickListener"
+            type="com.geeksmediapicker.interfaces.ItemClickListener" />
+    </data>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="@{()->clickListener.onClick(itemPosition, null)}">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_130sdp"
+            tools:ignore="UselessParent">
+
+            <ImageView
+                android:id="@+id/iv_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="@string/contentDescription"
+                android:scaleType="centerCrop"
+                bind:loadImageUri="@{albumData.imageUri}" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/shadow_top_bottom"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/tv_albumName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toStartOf="@+id/tv_imageCount"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/poppins_regular"
+                    android:maxLines="1"
+                    android:text="@{albumData.bucket_name}"
+                    android:textColor="@color/color_white"
+                    android:textSize="@dimen/_8ssp"
+                    tools:text="Album Name" />
+
+                <TextView
+                    android:id="@+id/tv_imageCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:fontFamily="@font/poppins_regular"
+                    android:text="@{albumData.totalImages}"
+                    android:textColor="@color/color_white"
+                    android:textSize="@dimen/_8ssp"
+                    tools:text="5" />
+            </RelativeLayout>
+        </FrameLayout>
+    </RelativeLayout>
+</layout>

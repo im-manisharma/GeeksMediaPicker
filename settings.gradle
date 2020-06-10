@@ -1,0 +1,3 @@
+rootProject.name='GeeksMediaPickerDemo'
+include ':app'
+include ':geeksmediapicker'
