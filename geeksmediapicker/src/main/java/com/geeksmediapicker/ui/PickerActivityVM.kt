@@ -6,16 +6,14 @@ import android.content.ContentResolver
 import android.content.ContentUris
 import android.database.ContentObserver
 import android.database.Cursor
-import android.net.Uri
-import android.os.Handler
 import android.provider.MediaStore
-import android.telephony.mbms.MbmsErrors
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.geeksmediapicker.GeeksMediaPicker
+import com.geeksmediapicker.GeeksMediaType
 import com.geeksmediapicker.models.MediaStoreData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +21,7 @@ import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class PickerActivityViewModel(application: Application) : AndroidViewModel(application) {
+class PickerActivityVM(application: Application) : AndroidViewModel(application) {
 
     private val TAG = "PickerActivityVM"
 
@@ -39,16 +37,8 @@ class PickerActivityViewModel(application: Application) : AndroidViewModel(appli
      */
     fun loadImages(mediaType: String) {
         viewModelScope.launch {
-            val mediaList = if (mediaType == GeeksMediaPicker.TYPE_IMAGE) queryImages() else queryVideos()
+            val mediaList = if (mediaType == GeeksMediaType.IMAGE) queryImages() else queryVideos()
             _mediaList.postValue(mediaList)
-
-            /*if (contentObserver == null) {
-                contentObserver = getApplication<Application>().contentResolver.registerObserver(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-                ) {
-                    loadImages(mediaType)
-                }
-            }*/
         }
     }
 
@@ -180,7 +170,7 @@ class PickerActivityViewModel(application: Application) : AndroidViewModel(appli
                             media_id = mediaId,
                             bucket_id = bucketId,
                             media_name = mediaName,
-                            media_type = GeeksMediaPicker.TYPE_IMAGE,
+                            media_type = GeeksMediaType.IMAGE,
                             bucket_name = bucketName,
                             date_added = dateModified,
                             content_uri = contentUri
@@ -334,7 +324,7 @@ class PickerActivityViewModel(application: Application) : AndroidViewModel(appli
                             media_id = mediaId,
                             bucket_id = bucketId,
                             media_name = mediaName,
-                            media_type = GeeksMediaPicker.TYPE_VIDEO,
+                            media_type = GeeksMediaType.VIDEO,
                             bucket_name = bucketName,
                             date_added = dateModified,
                             content_uri = contentUri,
@@ -355,30 +345,4 @@ class PickerActivityViewModel(application: Application) : AndroidViewModel(appli
         //Log.v(TAG, "Found ${videos.size} Videos")
         return videos
     }
-
-    /**
-     * Since we register a [ContentObserver], we want to unregister this when the `ViewModel`
-     * is being released.
-     */
-    override fun onCleared() {
-        contentObserver?.let {
-            getApplication<Application>().contentResolver.unregisterContentObserver(it)
-        }
-    }
-}
-
-/**
- * Convenience extension method to register a [ContentObserver] given a lambda.
- */
-private fun ContentResolver.registerObserver(
-    uri: Uri,
-    observer: (selfChange: Boolean) -> Unit
-): ContentObserver {
-    val contentObserver = object : ContentObserver(Handler()) {
-        override fun onChange(selfChange: Boolean) {
-            observer(selfChange)
-        }
-    }
-    registerContentObserver(uri, true, contentObserver)
-    return contentObserver
 }

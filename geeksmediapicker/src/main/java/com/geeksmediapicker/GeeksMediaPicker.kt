@@ -17,8 +17,6 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
     private val fragmentWeakRef: WeakReference<Fragment?> = WeakReference(fragment)
 
     companion object {
-        const val TYPE_IMAGE = "IMAGE"
-        const val TYPE_VIDEO = "VIDEO"
         const val EXTRA_MEDIA_TYPE = "MEDIA_TYPE"
         const val EXTRA_MULTI_SELECTION = "MULTI_SELECTION"
         const val EXTRA_INCLUDES_FILE_PATH = "INCLUDES_FILE_PATH"
@@ -39,7 +37,7 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
     private var maxCount: Int = 0
     private var minCount: Int = 0
     private var toolBarColor: Int = -1
-    private var mediaType: String = TYPE_IMAGE
+    private var mediaType: String = GeeksMediaType.IMAGE
     private var isMultiSelection: Boolean = false
     private var includesFilePath: Boolean = false
     private var isCompressionEnable: Boolean = false

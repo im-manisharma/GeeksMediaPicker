@@ -3,6 +3,7 @@ package com.geeksmediapickerdemo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.geeksmediapicker.GeeksMediaPicker
+import com.geeksmediapicker.GeeksMediaType
 import com.geeksmediapicker.models.MediaStoreData
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -21,9 +22,9 @@ class MainActivity : AppCompatActivity() {
         startPickerBtn.setOnClickListener {
 
             val mediaType = if (rbImage.isChecked) {
-                GeeksMediaPicker.TYPE_IMAGE
+                GeeksMediaType.IMAGE
             } else {
-                GeeksMediaPicker.TYPE_VIDEO
+                GeeksMediaType.VIDEO
             }
 
             val includesFilePath = cbIncludesPath.isChecked

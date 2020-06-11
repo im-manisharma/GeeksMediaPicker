@@ -6,9 +6,7 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import android.util.Log
 import android.view.View
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -20,7 +18,7 @@ import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_INCLUDES_FILE_PATH
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_MEDIA_TYPE
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_MULTI_SELECTION
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_TOOLBAR_COLOR
-import com.geeksmediapicker.GeeksMediaPicker.Companion.TYPE_IMAGE
+import com.geeksmediapicker.GeeksMediaType
 import com.geeksmediapicker.R
 import com.geeksmediapicker.adapters.AlbumAdapter
 import com.geeksmediapicker.adapters.GridSpacingItemDecoration
@@ -32,6 +30,7 @@ import com.geeksmediapicker.models.MediaStoreAlbum
 import com.geeksmediapicker.models.MediaStoreData
 import com.geeksmediapicker.utils.*
 import kotlinx.coroutines.*
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PickerActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -40,12 +39,12 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
     private var selectedAlbumPos: Int = -1
     private var mediaList = ArrayList<MediaStoreData>()
     private val albumList = ArrayList<MediaStoreAlbum>()
-    private val viewModel: PickerActivityViewModel by viewModels()
+    private val viewModel: PickerActivityVM by viewModel()
 
     private lateinit var binding: ActivityPickerBinding
 
     private val mediaType: String
-        get() = intent.getStringExtra(EXTRA_MEDIA_TYPE) ?: TYPE_IMAGE
+        get() = intent.getStringExtra(EXTRA_MEDIA_TYPE) ?: GeeksMediaType.IMAGE
 
     private val isMultiSelection: Boolean
         get() = intent.getBooleanExtra(EXTRA_MULTI_SELECTION, false)
@@ -135,7 +134,7 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
                 val mediaPickerListener: MediaPickerListener = GeeksMediaPicker.listenerDeque.pop()
                 GeeksMediaPicker.listenerDeque.clear()
 
-                if (isCompressionEnable && mediaType == TYPE_IMAGE) {
+                if (isCompressionEnable && mediaType == GeeksMediaType.IMAGE) {
                     binding.layoutProgressBar.visible()
                     GlobalScope.launch {
                         selectedMediaList.map {
