@@ -1,18 +1,16 @@
 package com.geeksmediapicker.ui
 
-import android.app.Application
 import android.content.ContentProvider
 import android.content.ContentResolver
 import android.content.ContentUris
-import android.database.ContentObserver
+import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.geeksmediapicker.GeeksMediaPicker
 import com.geeksmediapicker.GeeksMediaType
 import com.geeksmediapicker.models.MediaStoreData
 import kotlinx.coroutines.Dispatchers
@@ -21,28 +19,26 @@ import kotlinx.coroutines.withContext
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class PickerActivityVM(application: Application) : AndroidViewModel(application) {
+class PickerActivityVM: ViewModel() {
 
     private val TAG = "PickerActivityVM"
 
     private val _mediaList = MutableLiveData<List<MediaStoreData>>()
     val mediaList: LiveData<List<MediaStoreData>> get() = _mediaList
 
-    private var contentObserver: ContentObserver? = null
-
 
     /**
      * Performs a one shot load of images from [MediaStore.Images.Media.EXTERNAL_CONTENT_URI] into
      * the [_mediaList] [LiveData] above.
      */
-    fun loadImages(mediaType: String) {
+    fun loadImages(mediaType: String, context: Context) {
         viewModelScope.launch {
-            val mediaList = if (mediaType == GeeksMediaType.IMAGE) queryImages() else queryVideos()
+            val mediaList = if (mediaType == GeeksMediaType.IMAGE) queryImages(context) else queryVideos(context)
             _mediaList.postValue(mediaList)
         }
     }
 
-    private suspend fun queryImages(): List<MediaStoreData> {
+    private suspend fun queryImages(context: Context): List<MediaStoreData> {
         val images = mutableListOf<MediaStoreData>()
 
         /**
@@ -106,7 +102,7 @@ class PickerActivityVM(application: Application) : AndroidViewModel(application)
              */
             val sortOrder = "$columnMediaDateAdded DESC"
 
-            getApplication<Application>().contentResolver.query(
+            context.contentResolver.query(
                 mediaUri,
                 projection,
                 selection,
@@ -192,7 +188,7 @@ class PickerActivityVM(application: Application) : AndroidViewModel(application)
         return images
     }
 
-    private suspend fun queryVideos(): List<MediaStoreData> {
+    private suspend fun queryVideos(context: Context): List<MediaStoreData> {
         val videos = mutableListOf<MediaStoreData>()
 
         /**
@@ -258,7 +254,7 @@ class PickerActivityVM(application: Application) : AndroidViewModel(application)
              */
             val sortOrder = "$columnMediaDateAdded DESC"
 
-            getApplication<Application>().contentResolver.query(
+            context.contentResolver.query(
                 mediaUri,
                 projection,
                 selection,

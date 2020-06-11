@@ -1,15 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.geeksmediapicker" >
+    package="com.geeksmediapicker">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
-    <application
-        android:name=".application.MyApplication">
+    <application>
 
-        <activity android:name=".ui.PickerActivity"
+        <activity
+            android:name=".ui.PickerActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/GeeksMediaPickerTheme"/>
+            android:theme="@style/GeeksMediaPickerTheme" />
 
     </application>
 </manifest>

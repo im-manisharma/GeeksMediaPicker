@@ -12,6 +12,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.geeksmediapicker.GeeksMediaPicker
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_ENABLE_COMPRESSION
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_INCLUDES_FILE_PATH
@@ -30,7 +31,6 @@ import com.geeksmediapicker.models.MediaStoreAlbum
 import com.geeksmediapicker.models.MediaStoreData
 import com.geeksmediapicker.utils.*
 import kotlinx.coroutines.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PickerActivity : AppCompatActivity(), View.OnClickListener {
 
@@ -39,8 +39,8 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
     private var selectedAlbumPos: Int = -1
     private var mediaList = ArrayList<MediaStoreData>()
     private val albumList = ArrayList<MediaStoreAlbum>()
-    private val viewModel: PickerActivityVM by viewModel()
 
+    private lateinit var viewModel: PickerActivityVM
     private lateinit var binding: ActivityPickerBinding
 
     private val mediaType: String
@@ -66,7 +66,7 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_picker)
-
+        viewModel = ViewModelProvider(this).get(PickerActivityVM::class.java)
 
         inItUI()
         inItControl()
@@ -75,8 +75,8 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
         startFetchingMedia()
     }
 
-    private fun inItUI(){
-        if (toolbarColor != -1){
+    private fun inItUI() {
+        if (toolbarColor != -1) {
             binding.toolbarLayout.setBackgroundColor(toolbarColor)
         }
     }
@@ -139,7 +139,10 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
                     GlobalScope.launch {
                         selectedMediaList.map {
                             async {
-                                ImageCompressor.getCompressedImage(this@PickerActivity, it.content_uri) {filePath ->
+                                ImageCompressor.getCompressedImage(
+                                    this@PickerActivity,
+                                    it.content_uri
+                                ) { filePath ->
                                     //Log.e("PickerActivity", "compressed image path -->> ${filePath}")
                                     it.media_path = filePath
                                 }
@@ -152,8 +155,8 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
                             mediaPickerListener.onMediaPicked(selectedMediaList)
                         }
                     }
-                }else {
-                    if(includesFilePath){
+                } else {
+                    if (includesFilePath) {
                         for (media in selectedMediaList) {
                             if (media.content_uri != null) {
                                 media.media_path = FileUtils.getFilePath(this, media.content_uri!!)
@@ -281,7 +284,7 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun loadImages() {
-        viewModel.loadImages(mediaType)
+        viewModel.loadImages(mediaType, this)
     }
 
     private fun startFetchingMedia() {
