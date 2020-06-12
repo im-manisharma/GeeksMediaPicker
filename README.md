@@ -8,6 +8,12 @@ GeeksMediaPicker is a **simple media picker** library for Android.
 - You can get real path of a selected media (it will copy selected file to your app's package storage and returned that path).
 
 
+|       Demo App          |    Select Album         |    Select Media         |       Get Result         |
+|:-----------------------:|:-----------------------:|:-----------------------:|:-----------------------: |
+| ![](GeeksArts/art1.jpg) | ![](GeeksArts/art2.jpg) | ![](GeeksArts/art6.jpg) | ![](GeeksArts/art7.jpg)  |
+
+</br>
+
 ## Setup
 
 ### Gradle
