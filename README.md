@@ -5,7 +5,7 @@ GeeksMediaPicker is a **simple media picker** library for Android.
 - Support Single/Multiple select.
 - Support ImageCompression.
 - Competible with Android 10 and above.
-- You can get real path of a selceted media (it will copy selected file to your app's package storage and returned that path).
+- You can get real path of a selected media (it will copy selected file to your app's package storage and returned that path).
 
 
 ## Setup
@@ -13,6 +13,13 @@ GeeksMediaPicker is a **simple media picker** library for Android.
 ### Gradle
 
 ```gradle
+
+- Project level gradle
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
+- App level gradle file
 dependencies {
     //GeeksMediaPicker
     implementation 'com.github.im-manisharma:GeeksMediaPicker:1.0.0'
@@ -46,6 +53,7 @@ dataBinding {
 </br>
 
 #### To Get Single Media File
+
 
 ##### For Image
 
@@ -102,7 +110,28 @@ GeeksMediaPicker.with(this)
 
 </br>
 
-### 3. GeeksMediaPicker Customization
+### 3. GeeksMediaPicker Return Type
+
+##### MediaStoreData Class
+
+- It will return MediaStoreData class object
+- You can use this object to get all required information i.e.
+- Fields of MediaStoreData class
+
+```
+media_name: String      : Name of the selected media file.
+media_type: String      : Type of the selected media file.
+bucket_name: String?    : Album name of the selected media file, null in case file do not belongs from an Album.
+content_uri: Uri?       : Original MediaStore Uri of the selected file
+media_path: String      : Real Path of the selected file   
+media_duration: Long    : Duration of the selected media for Video file
+```
+
+
+
+</br>
+
+### 4. GeeksMediaPicker Customization
 
 - For now it is only support change toolbar color by calling e.g.
 
@@ -119,7 +148,7 @@ GeeksMediaPicker.with(this)
 </br>
 
 
-### 4. To Get Media File Path
+### 5. To Get Media File Path
 
 #### For Real Path (Without compression works for all types of MediaType)
 
@@ -149,7 +178,7 @@ GeeksMediaPicker.with(this)
 
 </br>
 
-### 5. All Public Functions
+### 6. All Public Functions
 
 * `setMediaType(MediaType)` : (default value)GeeksMediaType.IMAGE / GeeksMediaType.IMAGE
 * `setToolbarColor(Color.Blue)` : (default theme color)
@@ -158,7 +187,7 @@ GeeksMediaPicker.with(this)
 
 </br>
 
-### 6. Incoming improvements
+### 7. Incoming improvements
 
 - Set Maximum And Minimum Number Of Selection
 - Click Image From Camera Support
