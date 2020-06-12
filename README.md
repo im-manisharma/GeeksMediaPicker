@@ -121,7 +121,7 @@ GeeksMediaPicker.with(this)
 ```
 media_name: String      : Name of the selected media file.
 media_type: String      : Type of the selected media file.
-bucket_name: String?    : Album name of the selected media file, null in case file do not belongs from an Album.
+bucket_name: String?    : Album name of the selected media file, null if it is not belongs to any Album.
 content_uri: Uri?       : Original MediaStore Uri of the selected file
 media_path: String      : Real Path of the selected file   
 media_duration: Long    : Duration of the selected media for Video file
