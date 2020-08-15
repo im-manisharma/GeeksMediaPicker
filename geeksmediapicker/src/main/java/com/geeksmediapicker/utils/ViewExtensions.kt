@@ -8,27 +8,27 @@ import com.geeksmediapicker.R
 import kotlinx.android.synthetic.main.my_custom_toast.view.*
 
 
-fun View.visible() {
+internal fun View.visible() {
     if (visibility != View.VISIBLE){
         visibility = View.VISIBLE
     }
 }
 
-fun View.gone() {
+internal fun View.gone() {
     if (visibility != View.GONE){
         visibility = View.GONE
     }
 }
 
-fun View.invisible() {
+internal fun View.invisible() {
     if (visibility != View.INVISIBLE) {
         visibility = View.INVISIBLE
     }
 }
 
-fun View.isVisible(): Boolean = visibility == View.VISIBLE
+internal fun View.isVisible(): Boolean = visibility == View.VISIBLE
 
-fun Context.showToast(message: String) {
+internal fun Context.showToast(message: String) {
     val myInflater = LayoutInflater.from(this)
     val view = myInflater.inflate(R.layout.my_custom_toast, null)
     val myToast = Toast(this)

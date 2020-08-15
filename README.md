@@ -28,7 +28,7 @@ repositories {
 - App level gradle file
 dependencies {
     //GeeksMediaPicker
-    implementation 'com.github.im-manisharma:GeeksMediaPicker:1.0.0'
+    implementation 'com.github.im-manisharma:GeeksMediaPicker:1.1.0'
 }
 
 ```
@@ -81,7 +81,7 @@ GeeksMediaPicker.with(this)
      .startSingle { mediaStoreData ->
             val videoUri = mediaStoreData.content_uri
             //Now use this uri to play video
-            
+
             //To get video duration (in milliseconds)
             val videoDuration = mediaStoreData.media_duration
       }
@@ -114,6 +114,29 @@ GeeksMediaPicker.with(this)
       }
 ```
 
+##### For Image and Video (with max count)
+
+```
+GeeksMediaPicker.with(this)
+     .setMediaType(GeeksMediaType.IMAGE //or GeeksMediaType.VIDEO)
+     // Pass max count value in startMultiple() method as first parameter
+     .startMultiple(5//your count value) { mediaStoreDataList ->
+            //Now use this list to get images uri
+      }
+```
+
+#### To Get Media File From Camera (Only for Image. Record video is in underdevelopment)
+
+```
+GeeksMediaPicker.with(this)
+     .setEnableCompression(true)
+     .startCamera { mediaStoreData ->
+            val filePath = mediaStoreData.mediaPath
+      }
+```
+
+
+
 </br>
 
 ### 3. GeeksMediaPicker Return Type
@@ -129,7 +152,7 @@ media_name: String      : Name of the selected media file.
 media_type: String      : Type of the selected media file.
 bucket_name: String?    : Album name of the selected media file, null if it is not belongs to any Album.
 content_uri: Uri?       : Original MediaStore Uri of the selected file
-media_path: String      : Real Path of the selected file   
+media_path: String      : Real Path of the selected file
 media_duration: Long    : Duration of the selected media for Video file
 ```
 
@@ -176,7 +199,7 @@ GeeksMediaPicker.with(this)
      .setEnableCompression(true)
      .startSingle { mediaStoreData ->
             // you will receive compressed path in same key used for real file path
-            val compressedFilePath = mediaStoreData.media_path 
+            val compressedFilePath = mediaStoreData.media_path
       }
 ```
 
@@ -195,8 +218,7 @@ GeeksMediaPicker.with(this)
 
 ### 7. Incoming improvements
 
-- Set Maximum And Minimum Number Of Selection
-- Click Image From Camera Support
+- Set Minimum Number Of Selection
 - Record Video From Camera Support.
 - Add Support for Pdf and Audio file.
 - More customization will be added in next release.

@@ -6,6 +6,7 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -16,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.geeksmediapicker.GeeksMediaPicker
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_ENABLE_COMPRESSION
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_INCLUDES_FILE_PATH
+import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_MAX_COUNT
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_MEDIA_TYPE
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_MULTI_SELECTION
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_TOOLBAR_COLOR
@@ -57,6 +59,9 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
 
     private val toolbarColor: Int
         get() = intent.getIntExtra(EXTRA_TOOLBAR_COLOR, 0)
+
+    private val maxCount: Int
+        get() = intent.getIntExtra(EXTRA_MAX_COUNT, -1)
 
 
     companion object {
@@ -131,44 +136,46 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
                 val selectedMediaList = ArrayList(mediaList.filter { it.isSelected })
                 //Log.e("check", "${selectedMediaList.size}")
 
-                val mediaPickerListener: MediaPickerListener = GeeksMediaPicker.listenerDeque.pop()
-                GeeksMediaPicker.listenerDeque.clear()
+                if (selectedMediaList.isNotEmpty()) {
+                    val mediaPickerListener: MediaPickerListener = GeeksMediaPicker.listenerDeque.pop()
+                    GeeksMediaPicker.listenerDeque.clear()
 
-                if (isCompressionEnable && mediaType == GeeksMediaType.IMAGE) {
-                    binding.layoutProgressBar.visible()
-                    GlobalScope.launch {
-                        selectedMediaList.map {
-                            async {
-                                ImageCompressor.getCompressedImage(
-                                    this@PickerActivity,
-                                    it.content_uri
-                                ) { filePath ->
-                                    //Log.e("PickerActivity", "compressed image path -->> ${filePath}")
-                                    it.media_path = filePath
+                    if (isCompressionEnable && mediaType == GeeksMediaType.IMAGE) {
+                        binding.layoutProgressBar.visible()
+                        GlobalScope.launch {
+                            selectedMediaList.map {
+                                async {
+                                    ImageCompressor.getCompressedImage(
+                                        this@PickerActivity,
+                                        it.content_uri
+                                    ) { filePath ->
+                                        //Log.e("PickerActivity", "compressed image path -->> ${filePath}")
+                                        it.media_path = filePath
+                                    }
+                                }
+                            }.awaitAll()
+
+                            launch(Dispatchers.Main) {
+                                binding.layoutProgressBar.gone()
+                                finish()
+                                mediaPickerListener.onMediaPicked(selectedMediaList)
+                            }
+                        }
+                    } else {
+                        if (includesFilePath) {
+                            for (media in selectedMediaList) {
+                                if (media.content_uri != null) {
+                                    media.media_path = FileUtils.getFilePath(this, media.content_uri!!)
                                 }
                             }
-                        }.awaitAll()
-
-                        launch(Dispatchers.Main) {
-                            binding.layoutProgressBar.gone()
-                            finish()
-                            mediaPickerListener.onMediaPicked(selectedMediaList)
                         }
+
+                        mediaPickerListener.onMediaPicked(selectedMediaList)
+                        finish()
                     }
                 } else {
-                    if (includesFilePath) {
-                        for (media in selectedMediaList) {
-                            if (media.content_uri != null) {
-                                media.media_path = FileUtils.getFilePath(this, media.content_uri!!)
-                            }
-                        }
-                    }
-
-                    mediaPickerListener.onMediaPicked(selectedMediaList)
-                    finish()
+                    showToast("Please select an item")
                 }
-
-
             }
         }
     }
@@ -192,18 +199,26 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
             adapter = MediaAdapter(mediaList, object : ItemClickListener {
                 override fun onClick(position: Int, event: Any?) {
                     if (isMultiSelection) {
-                        mediaList[position].isSelected = !mediaList[position].isSelected
-                        binding.rvMedia.adapter?.notifyItemChanged(position)
 
+                        val isSelected = !mediaList[position].isSelected
 
-                        if (mediaList[position].isSelected) {
+                        if (isSelected) {
                             selectedCount += 1
                         } else {
                             selectedCount -= 1
                         }
 
-                        binding.tvTitle.text =
-                            String.format("%d %s", selectedCount, getString(R.string.selected))
+                        Log.e("My Check", "$selectedCount")
+
+
+                        if (maxCount != -1 && selectedCount >= maxCount + 1 ) {
+                            selectedCount -= 1
+                            showToast("Can't select more than $maxCount media items.")
+                        }else {
+                            binding.tvTitle.text = String.format("%d %s", selectedCount, getString(R.string.selected))
+                            mediaList[position].isSelected = isSelected
+                            binding.rvMedia.adapter?.notifyItemChanged(position)
+                        }
                     } else {
                         if (selectedItemPos == -1) {
                             mediaList[position].isSelected = true

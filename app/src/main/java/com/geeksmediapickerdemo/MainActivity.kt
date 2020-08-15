@@ -1,6 +1,8 @@
 package com.geeksmediapickerdemo
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.geeksmediapicker.GeeksMediaPicker
 import com.geeksmediapicker.GeeksMediaType
@@ -19,6 +21,9 @@ class MainActivity : AppCompatActivity() {
 
         inItAdapter()
 
+        val includesFilePath = cbIncludesPath.isChecked
+        val isCompressionEnable = cbEnableImageCompression.isChecked
+
         startPickerBtn.setOnClickListener {
 
             val mediaType = if (rbImage.isChecked) {
@@ -27,8 +32,7 @@ class MainActivity : AppCompatActivity() {
                 GeeksMediaType.VIDEO
             }
 
-            val includesFilePath = cbIncludesPath.isChecked
-            val isCompressionEnable = cbEnableImageCompression.isChecked
+
 
 
             if (rbSingle.isChecked) {
@@ -52,6 +56,21 @@ class MainActivity : AppCompatActivity() {
                         mediaList.addAll(dataList)
                         rvSelectedMedia.adapter?.notifyDataSetChanged()
                         //Log.e("My TAG", "${dataList}")
+                    }
+            }
+        }
+
+        startCameraBtn.setOnClickListener {
+            if (rbVideo.isChecked) {
+                Toast.makeText(this, "Under Development", Toast.LENGTH_SHORT).show()
+            }else {
+                GeeksMediaPicker.with(this)
+                    .setEnableCompression(isCompressionEnable)
+                    .startCamera { mediaStoreData ->
+                        Log.e("file path", mediaStoreData.media_path)
+                        mediaList.clear()
+                        mediaList.add(mediaStoreData)
+                        rvSelectedMedia.adapter?.notifyDataSetChanged()
                     }
             }
         }

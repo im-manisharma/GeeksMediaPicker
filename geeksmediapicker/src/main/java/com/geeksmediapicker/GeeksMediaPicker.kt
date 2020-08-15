@@ -3,9 +3,11 @@ package com.geeksmediapicker
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Camera
 import androidx.fragment.app.Fragment
 import com.geeksmediapicker.interfaces.MediaPickerListener
 import com.geeksmediapicker.models.MediaStoreData
+import com.geeksmediapicker.ui.CameraActivity
 import com.geeksmediapicker.ui.PickerActivity
 import java.lang.ref.WeakReference
 import java.util.*
@@ -22,6 +24,7 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
         const val EXTRA_INCLUDES_FILE_PATH = "INCLUDES_FILE_PATH"
         const val EXTRA_ENABLE_COMPRESSION = "ENABLE_COMPRESSION"
         const val EXTRA_TOOLBAR_COLOR = "TOOLBAR_COLOR"
+        const val EXTRA_MAX_COUNT = "MAX_COUNT"
 
         @JvmStatic
         fun with(activity: Activity) = GeeksMediaPicker(activity, null)
@@ -34,8 +37,7 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
     }
 
 
-    private var maxCount: Int = 0
-    private var minCount: Int = 0
+    private var maxCount: Int = -1
     private var toolBarColor: Int = -1
     private var mediaType: String = GeeksMediaType.IMAGE
     private var isMultiSelection: Boolean = false
@@ -53,16 +55,6 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
         return this
     }
 
-    private fun setMaxCount(maxCount: Int): GeeksMediaPicker {
-        this.maxCount = maxCount
-        return this
-    }
-
-    private fun setMinCount(minCount: Int): GeeksMediaPicker {
-        this.minCount = minCount
-        return this
-    }
-
     fun setIncludesFilePath(includesFilePath: Boolean): GeeksMediaPicker {
         this.includesFilePath = includesFilePath
         return this
@@ -76,7 +68,7 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
     fun startSingle(action: (MediaStoreData) -> Unit) {
         listenerDeque.clear()
         listenerDeque.push(object : MediaPickerListener {
-            override fun onMediaPicked(selectedMediaList: ArrayList<MediaStoreData>) {
+            override fun onMediaPicked(selectedMediaList: ArrayList<MediaStoreData>, mediaStoreData: MediaStoreData) {
                 action(selectedMediaList[0])
             }
         })
@@ -85,10 +77,11 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
         startPicker()
     }
 
-    fun startMultiple(action: (ArrayList<MediaStoreData>) -> Unit) {
+    fun startMultiple(maxCount: Int = -1, action: (ArrayList<MediaStoreData>) -> Unit) {
+        this.maxCount = maxCount
         listenerDeque.clear()
         listenerDeque.push(object : MediaPickerListener {
-            override fun onMediaPicked(selectedMediaList: ArrayList<MediaStoreData>) {
+            override fun onMediaPicked(selectedMediaList: ArrayList<MediaStoreData>, mediaStoreData: MediaStoreData) {
                 action(selectedMediaList)
             }
         })
@@ -97,7 +90,34 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
         startPicker()
     }
 
-    private fun startPicker(/*reqCode: Int*/) {
+    fun startCamera(action: (MediaStoreData) -> Unit) {
+        listenerDeque.clear()
+        listenerDeque.push(object : MediaPickerListener {
+            override fun onMediaPicked(selectedMediaList: ArrayList<MediaStoreData>, mediaStoreData: MediaStoreData) {
+                action(mediaStoreData)
+            }
+        })
+
+        val activity = activityWeakRef.get()
+        val fragment = fragmentWeakRef.get()
+
+        when {
+            activity != null -> openCamera(activity)
+            fragment != null && fragment.activity != null -> openCamera(fragment.activity!!)
+            else -> {
+                listenerDeque.clear()
+                throw NullPointerException("activity or fragment can't be null.")
+            }
+        }
+    }
+
+    private fun openCamera(activity: Activity) {
+        with(activity) {
+            startActivity(Intent(this, CameraActivity::class.java))
+        }
+    }
+
+    private fun startPicker() {
         val activity = activityWeakRef.get()
         val fragment = fragmentWeakRef.get()
 
@@ -118,6 +138,7 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
             putExtra(EXTRA_INCLUDES_FILE_PATH, includesFilePath)
             putExtra(EXTRA_ENABLE_COMPRESSION, isCompressionEnable)
             putExtra(EXTRA_TOOLBAR_COLOR, toolBarColor)
+            putExtra(EXTRA_MAX_COUNT, maxCount)
         }
     }
 }
