@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 
 
 @BindingAdapter("bind:loadImageUri")
-fun loadImageUri(imageView: ImageView, uri: Uri?) {
+internal fun loadImageUri(imageView: ImageView, uri: Uri?) {
     if (uri == null)
         return
 

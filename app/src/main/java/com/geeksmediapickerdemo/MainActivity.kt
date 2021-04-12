@@ -18,22 +18,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         inItAdapter()
-
-        val includesFilePath = cbIncludesPath.isChecked
-        val isCompressionEnable = cbEnableImageCompression.isChecked
-
         startPickerBtn.setOnClickListener {
+
+            val includesFilePath = cbIncludesPath.isChecked
+            val isCompressionEnable = cbEnableImageCompression.isChecked
 
             val mediaType = if (rbImage.isChecked) {
                 GeeksMediaType.IMAGE
             } else {
                 GeeksMediaType.VIDEO
             }
-
-
-
 
             if (rbSingle.isChecked) {
                 GeeksMediaPicker.with(this)
@@ -61,13 +56,14 @@ class MainActivity : AppCompatActivity() {
         }
 
         startCameraBtn.setOnClickListener {
+            val isCompressionEnable = cbEnableImageCompression.isChecked
             if (rbVideo.isChecked) {
                 Toast.makeText(this, "Under Development", Toast.LENGTH_SHORT).show()
             }else {
                 GeeksMediaPicker.with(this)
                     .setEnableCompression(isCompressionEnable)
                     .startCamera { mediaStoreData ->
-                        Log.e("file path", mediaStoreData.media_path)
+                        Log.e("file name", mediaStoreData.media_name)
                         mediaList.clear()
                         mediaList.add(mediaStoreData)
                         rvSelectedMedia.adapter?.notifyDataSetChanged()

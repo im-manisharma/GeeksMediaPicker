@@ -54,7 +54,8 @@
                     android:text="@{albumData.bucket_name}"
                     android:textColor="@color/color_white"
                     android:textSize="@dimen/_8ssp"
-                    tools:text="Album Name" />
+                    tools:text="Album Name"
+                    android:layout_toLeftOf="@+id/tv_imageCount" />
 
                 <TextView
                     android:id="@+id/tv_imageCount"
@@ -66,7 +67,8 @@
                     android:text="@{albumData.totalImages}"
                     android:textColor="@color/color_white"
                     android:textSize="@dimen/_8ssp"
-                    tools:text="5" />
+                    tools:text="5"
+                    android:layout_alignParentRight="true" />
             </RelativeLayout>
         </FrameLayout>
     </RelativeLayout>

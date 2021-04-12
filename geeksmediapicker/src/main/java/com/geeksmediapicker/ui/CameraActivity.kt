@@ -12,44 +12,46 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import com.geeksmediapicker.GeeksMediaPicker
 import com.geeksmediapicker.GeeksMediaType
 import com.geeksmediapicker.R
 import com.geeksmediapicker.interfaces.MediaPickerListener
 import com.geeksmediapicker.models.MediaStoreData
 import com.geeksmediapicker.utils.ImageCompressor
+import com.geeksmediapicker.utils.REQ_CODE_CAPTURE_IMAGE
+import com.geeksmediapicker.utils.showPermissionSettingDialog
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
-import java.text.SimpleDateFormat
 import java.util.*
 
 class CameraActivity : AppCompatActivity() {
-
-    private var capturedImagePath = ""
-    private val REQ_CODE_CAPTURE_IMAGE: Int = 1110
+    private var mImageName = ""
+    private var mCapturedImagePath = ""
     private val isCompressionEnable: Boolean
         get() = intent.getBooleanExtra(GeeksMediaPicker.EXTRA_ENABLE_COMPRESSION, false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_camera)
-
         checkPermission()
     }
-
 
     private fun checkPermission() {
         if (isPermissionGranted(this)) {
             openCamera()
         } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CAMERA),
-                REQ_CODE_CAPTURE_IMAGE
-            )
+           requestCameraPermission()
         }
+    }
+
+    private fun requestCameraPermission(){
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.CAMERA),
+            REQ_CODE_CAPTURE_IMAGE
+        )
     }
 
     private fun isPermissionGranted(context: Context) =
@@ -58,19 +60,18 @@ class CameraActivity : AppCompatActivity() {
             Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
 
-
     private fun openCamera() {
+        mImageName = ""
+        mCapturedImagePath = ""
+
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        val timeStamp = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(Date())
-        val fileName = "Image_$timeStamp"
         val directory = File(getExternalFilesDir(null), "Camera")
         if (!directory.exists()) {
             directory.mkdir()
         }
-
-        capturedImagePath = ""
-        val file = File.createTempFile(fileName, ".jpg", directory)
-        capturedImagePath = file.absolutePath
+        val file = File.createTempFile("Img_", ".jpg", directory)
+        mImageName = file.name
+        mCapturedImagePath = file.absolutePath
 
         val fileUri = FileProvider.getUriForFile(this, "${packageName}.provider", file)
 
@@ -95,10 +96,19 @@ class CameraActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         if (requestCode == REQ_CODE_CAPTURE_IMAGE && grantResults.isNotEmpty()) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera()
+            } else if (grantResults[0] == PackageManager.PERMISSION_DENIED){
+                val shouldShowRequestPermissionRationale = ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+                if (shouldShowRequestPermissionRationale) {
+                    requestCameraPermission()
+                }else{
+                    showPermissionSettingDialog()
+                }
             }
         }
     }
@@ -109,28 +119,27 @@ class CameraActivity : AppCompatActivity() {
             val mediaPickerListener: MediaPickerListener = GeeksMediaPicker.listenerDeque.pop()
             GeeksMediaPicker.listenerDeque.clear()
 
-            val mediaUri = Uri.fromFile(File(capturedImagePath))
+            val mediaUri = Uri.fromFile(File(mCapturedImagePath))
             if (isCompressionEnable) {
-                GlobalScope.launch {
+                lifecycleScope.launch {
                     ImageCompressor.getCompressedImage(this@CameraActivity, mediaUri) { filePath ->
-
                         launch(Dispatchers.Main) {
                             val mediaStoreData = MediaStoreData(
                                 media_type = GeeksMediaType.IMAGE,
                                 media_path = filePath,
+                                media_name = mImageName,
                                 content_uri = Uri.fromFile(File(filePath))
                             )
-
                             mediaPickerListener.onMediaPicked(mediaStoreData = mediaStoreData)
                             finish()
                         }
                     }
                 }
             } else {
-
                 val mediaStoreData = MediaStoreData(
                     media_type = GeeksMediaType.IMAGE,
-                    media_path = capturedImagePath,
+                    media_path = mCapturedImagePath,
+                    media_name = mImageName,
                     content_uri = mediaUri
                 )
                 mediaPickerListener.onMediaPicked(mediaStoreData = mediaStoreData)

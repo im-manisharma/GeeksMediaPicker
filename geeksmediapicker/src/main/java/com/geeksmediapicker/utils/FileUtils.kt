@@ -71,15 +71,13 @@ object FileUtils {
     }
 
     private fun getVideoThumbBitmaps(context: Context, videoUri: Uri): ArrayList<Bitmap> {
-
         val thumbnailList = ArrayList<Bitmap>()
-
         try {
             val mdr = MediaMetadataRetriever()
             mdr.setDataSource(context, videoUri)
 
             // Retrieve media data
-            val videoLengthInMs = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLong() * 1000
+            val videoLengthInMs = mdr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()?:0 * 1000
 
             // Set thumbnail properties (Thumbs are squares)
             val thumbWidth = 512
@@ -92,22 +90,16 @@ object FileUtils {
             for (i in 0 until numThumbs) {
                 try {
                     var bitmap = mdr.getFrameAtTime(i * interval, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)
-                    bitmap = Bitmap.createScaledBitmap(bitmap, thumbWidth, thumbHeight, false)
+                    bitmap = Bitmap.createScaledBitmap(bitmap!!, thumbWidth, thumbHeight, false)
                     thumbnailList.add(bitmap)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
-
             mdr.release()
         }catch (e: Exception) {
             e.printStackTrace()
         }
-
         return thumbnailList
     }
-
-
-
-
 }

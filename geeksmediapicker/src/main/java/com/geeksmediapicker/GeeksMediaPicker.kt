@@ -3,7 +3,6 @@ package com.geeksmediapicker
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.graphics.Camera
 import androidx.fragment.app.Fragment
 import com.geeksmediapicker.interfaces.MediaPickerListener
 import com.geeksmediapicker.models.MediaStoreData
@@ -11,7 +10,6 @@ import com.geeksmediapicker.ui.CameraActivity
 import com.geeksmediapicker.ui.PickerActivity
 import java.lang.ref.WeakReference
 import java.util.*
-import kotlin.collections.ArrayList
 
 class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragment?) {
 
@@ -36,14 +34,12 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
         val listenerDeque: Deque<MediaPickerListener> = ArrayDeque()
     }
 
-
     private var maxCount: Int = -1
     private var toolBarColor: Int = -1
     private var mediaType: String = GeeksMediaType.IMAGE
     private var isMultiSelection: Boolean = false
     private var includesFilePath: Boolean = false
     private var isCompressionEnable: Boolean = false
-
 
     fun setMediaType(mediaType: String): GeeksMediaPicker {
         this.mediaType = mediaType
@@ -103,7 +99,7 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
 
         when {
             activity != null -> openCamera(activity)
-            fragment != null && fragment.activity != null -> openCamera(fragment.activity!!)
+            fragment != null -> openCamera(fragment.requireActivity())
             else -> {
                 listenerDeque.clear()
                 throw NullPointerException("activity or fragment can't be null.")
@@ -123,7 +119,7 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
 
         when {
             activity != null -> activity.startActivity(getIntentWithData(activity))
-            fragment != null -> fragment.startActivity(getIntentWithData(fragment.context))
+            fragment != null -> fragment.startActivity(getIntentWithData(fragment.requireContext()))
             else -> {
                 listenerDeque.clear()
                 throw NullPointerException("activity or fragment can't be null.")

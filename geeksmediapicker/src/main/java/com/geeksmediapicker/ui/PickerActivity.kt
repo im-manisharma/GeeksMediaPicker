@@ -6,14 +6,13 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.geeksmediapicker.GeeksMediaPicker
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_ENABLE_COMPRESSION
 import com.geeksmediapicker.GeeksMediaPicker.Companion.EXTRA_INCLUDES_FILE_PATH
@@ -41,7 +40,6 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
     private var selectedAlbumPos: Int = -1
     private var mediaList = ArrayList<MediaStoreData>()
     private val albumList = ArrayList<MediaStoreAlbum>()
-
     private lateinit var viewModel: PickerActivityVM
     private lateinit var binding: ActivityPickerBinding
 
@@ -62,11 +60,6 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
 
     private val maxCount: Int
         get() = intent.getIntExtra(EXTRA_MAX_COUNT, -1)
-
-
-    companion object {
-        private const val REQ_EXTERNAL_STORAGE = 0x1045
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,8 +96,8 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun showAlbumLayout() {
+        selectedItemPos = -1
         selectedCount = 0
-
         binding.apply {
             rvMedia.gone()
             okBtn.invisible()
@@ -114,7 +107,6 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun showMediaLayout() {
-
         with(binding) {
             okBtn.visible()
             rvAlbums.gone()
@@ -135,14 +127,12 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
             } else {
                 val selectedMediaList = ArrayList(mediaList.filter { it.isSelected })
                 //Log.e("check", "${selectedMediaList.size}")
-
                 if (selectedMediaList.isNotEmpty()) {
                     val mediaPickerListener: MediaPickerListener = GeeksMediaPicker.listenerDeque.pop()
                     GeeksMediaPicker.listenerDeque.clear()
-
                     if (isCompressionEnable && mediaType == GeeksMediaType.IMAGE) {
                         binding.layoutProgressBar.visible()
-                        GlobalScope.launch {
+                        lifecycleScope.launch {
                             selectedMediaList.map {
                                 async {
                                     ImageCompressor.getCompressedImage(
@@ -169,7 +159,6 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
                                 }
                             }
                         }
-
                         mediaPickerListener.onMediaPicked(selectedMediaList)
                         finish()
                     }
@@ -185,9 +174,9 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
             adapter = AlbumAdapter(albumList, object : ItemClickListener {
                 override fun onClick(position: Int, event: Any?) {
                     selectedAlbumPos = position
-
                     mediaList.clear()
                     mediaList.addAll(albumList[position].medias)
+                    //Log.e("list_size", "${mediaList.size}")
                     binding.rvMedia.adapter?.notifyDataSetChanged()
                     showMediaLayout()
                 }
@@ -199,18 +188,13 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
             adapter = MediaAdapter(mediaList, object : ItemClickListener {
                 override fun onClick(position: Int, event: Any?) {
                     if (isMultiSelection) {
-
                         val isSelected = !mediaList[position].isSelected
-
                         if (isSelected) {
                             selectedCount += 1
                         } else {
                             selectedCount -= 1
                         }
-
-                        Log.e("My Check", "$selectedCount")
-
-
+                        //Log.e("My Check", "$selectedCount")
                         if (maxCount != -1 && selectedCount >= maxCount + 1 ) {
                             selectedCount -= 1
                             showToast("Can't select more than $maxCount media items.")
@@ -239,7 +223,7 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
 
 
     private fun inItObservable() {
-        viewModel.mediaList.observe(this, Observer { images ->
+        viewModel.mediaList.observe(this, { images ->
             val mAlbumList = images.groupBy { it.bucket_id }.map {
                 MediaStoreAlbum(
                     bucket_id = it.key,
@@ -253,9 +237,7 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
             albumList.addAll(mAlbumList)
             binding.rvAlbums.adapter?.notifyDataSetChanged()
         })
-
     }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -276,21 +258,10 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
                             this,
                             Manifest.permission.READ_EXTERNAL_STORAGE
                         )
-
-                    /**
-                     * If we should show the rationale for requesting storage permission, then
-                     * we'll show [ActivityMainBinding.permissionRationaleView] which does this.
-                     *
-                     * If `showRationale` is false, this means the user has not only denied
-                     * the permission, but they've clicked "Don't ask again". In this case
-                     * we send the user to the settings page for the app so they can grant
-                     * the permission (Yay!) or uninstall the app.
-                     */
                     if (showRationale) {
-                        showToast("Storage permission denied.")
-                        finish()
+                        requestPermission()
                     } else {
-                        goToSettings()
+                        showPermissionSettingDialog()
                     }
                 }
                 return
@@ -333,13 +304,10 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
      * Convenience method to request [Manifest.permission.READ_EXTERNAL_STORAGE] permission.
      */
     private fun requestPermission() {
-        if (!haveStoragePermission()) {
-            val permissions = arrayOf(
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            ActivityCompat.requestPermissions(this, permissions, REQ_EXTERNAL_STORAGE)
-        }
+        ActivityCompat.requestPermissions(this, arrayOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        ), REQ_EXTERNAL_STORAGE)
     }
 }
 

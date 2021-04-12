@@ -20,12 +20,8 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class PickerActivityVM: ViewModel() {
-
-    private val TAG = "PickerActivityVM"
-
     private val _mediaList = MutableLiveData<List<MediaStoreData>>()
     val mediaList: LiveData<List<MediaStoreData>> get() = _mediaList
-
 
     /**
      * Performs a one shot load of images from [MediaStore.Images.Media.EXTERNAL_CONTENT_URI] into
@@ -179,7 +175,6 @@ class PickerActivityVM: ViewModel() {
                         e.printStackTrace()
                         Log.e("Exception", "Message -> ${e.localizedMessage}")
                     }
-
                 }
             }
         }

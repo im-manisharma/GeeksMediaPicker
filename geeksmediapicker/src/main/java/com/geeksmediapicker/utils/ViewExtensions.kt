@@ -9,21 +9,15 @@ import kotlinx.android.synthetic.main.my_custom_toast.view.*
 
 
 internal fun View.visible() {
-    if (visibility != View.VISIBLE){
-        visibility = View.VISIBLE
-    }
+    visibility = View.VISIBLE
 }
 
 internal fun View.gone() {
-    if (visibility != View.GONE){
-        visibility = View.GONE
-    }
+    visibility = View.GONE
 }
 
 internal fun View.invisible() {
-    if (visibility != View.INVISIBLE) {
-        visibility = View.INVISIBLE
-    }
+    visibility = View.INVISIBLE
 }
 
 internal fun View.isVisible(): Boolean = visibility == View.VISIBLE

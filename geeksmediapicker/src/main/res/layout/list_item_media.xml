@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:bind="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
@@ -59,7 +60,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:drawableStart="@drawable/ic_video_white"
+                    app:drawableStartCompat="@drawable/ic_video_white"
                     android:drawablePadding="@dimen/_4sdp"
                     android:ellipsize="end"
                     android:fontFamily="@font/poppins_medium"
@@ -68,7 +69,8 @@
                     android:textColor="@color/color_white"
                     android:textSize="@dimen/_8ssp"
                     android:visibility="@{mediaData.media_type == `VIDEO`? View.VISIBLE: View.GONE, default = visible}"
-                    tools:text="1:30 s" />
+                    tools:text="1:30 s"
+                    app:drawableLeftCompat="@drawable/ic_video_white" />
             </FrameLayout>
         </FrameLayout>
     </RelativeLayout>
