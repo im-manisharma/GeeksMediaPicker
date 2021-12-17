@@ -63,7 +63,6 @@ class MainActivity : AppCompatActivity() {
                 GeeksMediaPicker.with(this)
                     .setEnableCompression(isCompressionEnable)
                     .startCamera { mediaStoreData ->
-                        Log.e("file name", mediaStoreData.media_name)
                         mediaList.clear()
                         mediaList.add(mediaStoreData)
                         rvSelectedMedia.adapter?.notifyDataSetChanged()

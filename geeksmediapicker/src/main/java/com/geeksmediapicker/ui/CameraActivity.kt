@@ -42,11 +42,11 @@ class CameraActivity : AppCompatActivity() {
         if (isPermissionGranted(this)) {
             openCamera()
         } else {
-           requestCameraPermission()
+            requestCameraPermission()
         }
     }
 
-    private fun requestCameraPermission(){
+    private fun requestCameraPermission() {
         ActivityCompat.requestPermissions(
             this,
             arrayOf(Manifest.permission.CAMERA),
@@ -99,14 +99,15 @@ class CameraActivity : AppCompatActivity() {
         if (requestCode == REQ_CODE_CAPTURE_IMAGE && grantResults.isNotEmpty()) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 openCamera()
-            } else if (grantResults[0] == PackageManager.PERMISSION_DENIED){
-                val shouldShowRequestPermissionRationale = ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
+            } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                val shouldShowRequestPermissionRationale =
+                    ActivityCompat.shouldShowRequestPermissionRationale(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    )
                 if (shouldShowRequestPermissionRationale) {
                     requestCameraPermission()
-                }else{
+                } else {
                     showPermissionSettingDialog()
                 }
             }
@@ -120,6 +121,7 @@ class CameraActivity : AppCompatActivity() {
             GeeksMediaPicker.listenerDeque.clear()
 
             val mediaUri = Uri.fromFile(File(mCapturedImagePath))
+
             if (isCompressionEnable) {
                 lifecycleScope.launch {
                     ImageCompressor.getCompressedImage(this@CameraActivity, mediaUri) { filePath ->
@@ -127,7 +129,7 @@ class CameraActivity : AppCompatActivity() {
                             val mediaStoreData = MediaStoreData(
                                 media_type = GeeksMediaType.IMAGE,
                                 media_path = filePath,
-                                media_name = mImageName,
+                                media_name = File(filePath).name,
                                 content_uri = Uri.fromFile(File(filePath))
                             )
                             mediaPickerListener.onMediaPicked(mediaStoreData = mediaStoreData)

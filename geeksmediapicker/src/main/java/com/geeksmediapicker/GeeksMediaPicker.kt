@@ -109,7 +109,9 @@ class GeeksMediaPicker private constructor(activity: Activity?, fragment: Fragme
 
     private fun openCamera(activity: Activity) {
         with(activity) {
-            startActivity(Intent(this, CameraActivity::class.java))
+            startActivity(Intent(this, CameraActivity::class.java).apply {
+                putExtra(EXTRA_ENABLE_COMPRESSION, isCompressionEnable)
+            })
         }
     }
 

@@ -35,7 +35,7 @@ object FileUtils {
     }
 
     fun getFileName(contentResolver: ContentResolver, uri: Uri): String {
-        var name = ""
+        var name = "Image_${System.currentTimeMillis()}.jpeg"
         contentResolver.query(uri, null, null, null, null)?.use {
             val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
             if (it.moveToFirst()) {
