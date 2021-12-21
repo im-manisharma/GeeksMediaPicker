@@ -28,7 +28,7 @@ repositories {
 - App level gradle file
 dependencies {
     //GeeksMediaPicker
-    implementation 'com.github.im-manisharma:GeeksMediaPicker:1.1.0'
+    implementation 'com.github.im-manisharma:GeeksMediaPicker:1.1.2'
 }
 
 ```
