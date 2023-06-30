@@ -1,66 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:cardCornerRadius="4dp"
-    app:cardElevation="4dp"
-    app:cardUseCompatPadding="true">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <RelativeLayout
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp">
+        app:cardCornerRadius="4dp"
+        app:cardElevation="4dp"
+        app:cardUseCompatPadding="true">
 
-        <ImageView
-            android:id="@+id/ivProductImage"
-            android:layout_width="80dp"
-            android:layout_height="100dp"
-            android:layout_centerVertical="true"
-            android:contentDescription="@string/contentDescription"
-            android:scaleType="fitXY" />
-
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="8dp"
-            android:layout_toEndOf="@+id/ivProductImage"
-            android:orientation="vertical"
-            android:layout_toRightOf="@+id/ivProductImage"
-            android:layout_marginLeft="8dp">
+            android:padding="8dp">
 
-            <TextView
-                android:id="@+id/tvMediaName"
-                android:layout_width="wrap_content"
+            <ImageView
+                android:id="@+id/ivProductImage"
+                android:layout_width="80dp"
+                android:layout_height="100dp"
+                android:layout_centerVertical="true"
+                android:contentDescription="@string/contentDescription"
+                android:scaleType="fitXY" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Name"
-                android:textSize="12sp" />
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_toEndOf="@+id/ivProductImage"
+                android:layout_toRightOf="@+id/ivProductImage"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvMediaMimeType"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="MimeType"
-                android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/tvMediaName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/tvMediaUri"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Uri"
-                android:textSize="12sp" />
+                <TextView
+                    android:id="@+id/tvMediaMimeType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="MimeType"
+                    android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/tvMediaPath"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Media Path"
-                android:textSize="12sp" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tvMediaUri"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Uri"
+                    android:textSize="12sp" />
 
-    </RelativeLayout>
-</androidx.cardview.widget.CardView>
+                <TextView
+                    android:id="@+id/tvMediaPath"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Media Path"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+</layout>

@@ -3,9 +3,9 @@ package com.geeksmediapicker.utils
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import com.geeksmediapicker.R
-import kotlinx.android.synthetic.main.my_custom_toast.view.*
 
 
 internal fun View.visible() {
@@ -28,7 +28,7 @@ internal fun Context.showToast(message: String) {
     val myToast = Toast(this)
     myToast.duration = Toast.LENGTH_SHORT
     myToast.view = view
-    view.tvMsg.text = message
+    view.findViewById<TextView>(R.id.tvMsg).text = message
     myToast.show()
 }
 

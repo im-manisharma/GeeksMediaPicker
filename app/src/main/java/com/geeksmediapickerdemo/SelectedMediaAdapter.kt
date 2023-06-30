@@ -5,9 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.geeksmediapicker.models.MediaStoreAlbum
 import com.geeksmediapicker.models.MediaStoreData
-import kotlinx.android.synthetic.main.list_item_selected_media.view.*
+import com.geeksmediapickerdemo.databinding.ListItemSelectedMediaBinding
 import java.util.*
 
 class SelectedMediaAdapter(
@@ -16,7 +15,7 @@ class SelectedMediaAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return MyViewHolder(inflater.inflate(R.layout.list_item_selected_media, parent, false))
+        return MyViewHolder(ListItemSelectedMediaBinding.inflate(inflater))
     }
 
     override fun getItemCount(): Int {
@@ -25,20 +24,20 @@ class SelectedMediaAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) = holder.bind(position)
 
-    inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class MyViewHolder(val binding: ListItemSelectedMediaBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
             val model = list[position]
 
             with(itemView){
-                Glide.with(ivProductImage.context)
+                Glide.with(binding.ivProductImage.context)
                     .load(model.content_uri)
                     .thumbnail(0.3f)
-                    .into(ivProductImage)
+                    .into(binding.ivProductImage)
                 //ivProductImage.setImageURI(model.content_uri)
-                tvMediaName.text = "Name: ${model.media_name}"
-                tvMediaMimeType.text = "Type: ${model.media_type}"
-                tvMediaUri.text = "Uri: ${model.content_uri}"
-                tvMediaPath.text = "Path: ${model.media_path}"
+                binding.tvMediaName.text = "Name: ${model.media_name}"
+                binding.tvMediaMimeType.text = "Type: ${model.media_type}"
+                binding.tvMediaUri.text = "Uri: ${model.content_uri}"
+                binding.tvMediaPath.text = "Path: ${model.media_path}"
             }
         }
     }

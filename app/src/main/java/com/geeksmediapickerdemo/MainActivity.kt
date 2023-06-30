@@ -1,36 +1,44 @@
 package com.geeksmediapickerdemo
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import com.geeksmediapicker.GeeksMediaPicker
 import com.geeksmediapicker.GeeksMediaType
 import com.geeksmediapicker.models.MediaStoreData
-import kotlinx.android.synthetic.main.activity_main.*
+import com.geeksmediapickerdemo.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
 
+    private lateinit var binding : ActivityMainBinding
     private val mediaList = ArrayList<MediaStoreData>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         inItAdapter()
-        startPickerBtn.setOnClickListener {
+        inItListener()
+    }
 
-            val includesFilePath = cbIncludesPath.isChecked
-            val isCompressionEnable = cbEnableImageCompression.isChecked
+    private fun inItAdapter(){
+        binding.rvSelectedMedia.adapter = SelectedMediaAdapter(mediaList)
+    }
 
-            val mediaType = if (rbImage.isChecked) {
+    private fun inItListener() {
+        binding.startPickerBtn.setOnClickListener {
+
+            val includesFilePath = binding.cbIncludesPath.isChecked
+            val isCompressionEnable = binding.cbEnableImageCompression.isChecked
+
+            val mediaType = if (binding.rbImage.isChecked) {
                 GeeksMediaType.IMAGE
             } else {
                 GeeksMediaType.VIDEO
             }
 
-            if (rbSingle.isChecked) {
+            if (binding.rbSingle.isChecked) {
                 GeeksMediaPicker.with(this)
                     .setMediaType(mediaType)
                     .setIncludesFilePath(includesFilePath)
@@ -38,7 +46,7 @@ class MainActivity : AppCompatActivity() {
                     .startSingle { data ->
                         mediaList.clear()
                         mediaList.add(data)
-                        rvSelectedMedia.adapter?.notifyDataSetChanged()
+                        binding.rvSelectedMedia.adapter?.notifyDataSetChanged()
                         //Log.e("My TAG", "${data}")
                     }
             } else {
@@ -49,15 +57,15 @@ class MainActivity : AppCompatActivity() {
                     .startMultiple { dataList ->
                         mediaList.clear()
                         mediaList.addAll(dataList)
-                        rvSelectedMedia.adapter?.notifyDataSetChanged()
+                        binding.rvSelectedMedia.adapter?.notifyDataSetChanged()
                         //Log.e("My TAG", "${dataList}")
                     }
             }
         }
 
-        startCameraBtn.setOnClickListener {
-            val isCompressionEnable = cbEnableImageCompression.isChecked
-            if (rbVideo.isChecked) {
+        binding.startCameraBtn.setOnClickListener {
+            val isCompressionEnable = binding.cbEnableImageCompression.isChecked
+            if (binding.rbVideo.isChecked) {
                 Toast.makeText(this, "Under Development", Toast.LENGTH_SHORT).show()
             }else {
                 GeeksMediaPicker.with(this)
@@ -65,13 +73,9 @@ class MainActivity : AppCompatActivity() {
                     .startCamera { mediaStoreData ->
                         mediaList.clear()
                         mediaList.add(mediaStoreData)
-                        rvSelectedMedia.adapter?.notifyDataSetChanged()
+                        binding.rvSelectedMedia.adapter?.notifyDataSetChanged()
                     }
             }
         }
-    }
-
-    private fun inItAdapter(){
-        rvSelectedMedia.adapter = SelectedMediaAdapter(mediaList)
     }
 }

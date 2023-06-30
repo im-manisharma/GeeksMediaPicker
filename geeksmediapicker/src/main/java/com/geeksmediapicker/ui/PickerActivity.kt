@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.view.View
@@ -223,7 +224,7 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
 
 
     private fun inItObservable() {
-        viewModel.mediaList.observe(this, { images ->
+        viewModel.mediaList.observe(this) { images ->
             val mAlbumList = images.groupBy { it.bucket_id }.map {
                 MediaStoreAlbum(
                     bucket_id = it.key,
@@ -236,7 +237,7 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
             albumList.clear()
             albumList.addAll(mAlbumList)
             binding.rvAlbums.adapter?.notifyDataSetChanged()
-        })
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -253,11 +254,20 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
                 } else {
                     // If we weren't granted the permission, check to see if we should show
                     // rationale for the permission.
-                    val showRationale =
+                    val showRationale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        ActivityCompat.shouldShowRequestPermissionRationale(
+                            this,
+                            Manifest.permission.READ_MEDIA_IMAGES
+                        ) && ActivityCompat.shouldShowRequestPermissionRationale(
+                            this,
+                            Manifest.permission.READ_MEDIA_VIDEO
+                        )
+                    } else {
                         ActivityCompat.shouldShowRequestPermissionRationale(
                             this,
                             Manifest.permission.READ_EXTERNAL_STORAGE
                         )
+                    }
                     if (showRationale) {
                         requestPermission()
                     } else {
@@ -274,7 +284,7 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun startFetchingMedia() {
-        if (haveStoragePermission()) {
+        if (haveReadImagePermission()) {
             loadImages()
         } else {
             requestPermission()
@@ -294,20 +304,42 @@ class PickerActivity : AppCompatActivity(), View.OnClickListener {
      * Convenience method to check if [Manifest.permission.READ_EXTERNAL_STORAGE] permission
      * has been granted to the app.
      */
-    private fun haveStoragePermission() =
-        ContextCompat.checkSelfPermission(
-            this,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PERMISSION_GRANTED
+    private fun haveReadImagePermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_MEDIA_IMAGES
+            ) == PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_MEDIA_VIDEO
+            ) == PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PERMISSION_GRANTED
+        }
+    }
 
     /**
      * Convenience method to request [Manifest.permission.READ_EXTERNAL_STORAGE] permission.
      */
     private fun requestPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ), REQ_EXTERNAL_STORAGE)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                    Manifest.permission.READ_MEDIA_VIDEO,
+                ), REQ_EXTERNAL_STORAGE
+            )
+        } else {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ), REQ_EXTERNAL_STORAGE
+            )
+        }
     }
 }
 
